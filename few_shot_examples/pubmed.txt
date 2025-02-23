@@ -1,0 +1,18 @@
+
+Example1:
+## Target node:
+Paper id: 10248
+Title: Genetic control of low-dose streptozotocin-induced autoimmune diabetes in mice.
+Answer: Experimentally induced diabetes
+
+Example2:
+## Target node:
+Paper id: 13121
+Title: Type 1 diabetes as a relapsing-remitting disease?
+Answer: Type 1 diabetes
+
+Example3:
+## Target node:
+Paper id: 9557
+Title: Severely impaired insulin signaling in chronic wounds of diabetic ob/ob mice: a potential role of tumor necrosis factor-alpha.
+Answer: Type 2 diabetes

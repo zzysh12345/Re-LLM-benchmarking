@@ -1,0 +1,18 @@
+
+Example1:
+## Target node:
+Paper id: 105626
+Title: optimization of the belief propagation algorithm for distributed detection by linear data fusion techniques
+Answer: cs.IT
+
+Example2:
+## Target node:
+Paper id: 29799
+Title: fashion outfit generation for e commerce
+Answer: cs.CV
+
+Example3:
+## Target node:
+Paper id: 132923
+Title: fast and scalable position based layout synthesis
+Answer: cs.GR

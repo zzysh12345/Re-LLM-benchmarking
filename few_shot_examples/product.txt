@@ -1,0 +1,18 @@
+
+Example1:
+## Target node:
+Product id: 1587226
+Title: 40 Pc Wooden Alphabet Tile Set Common Alphabet Crafts Scrapbooking Tiles 3/4in
+Answer: Toys & Games
+
+Example2:
+## Target node:
+Product id: 1363004
+Title: ACDelco 24227747 Valve Assembly
+Answer: Automotive
+
+Example3:
+## Target node:
+Product id: 1520872
+Title: Eureka Mighty Mite Canister Rear Wheel
+Answer: Industrial & Scientifi

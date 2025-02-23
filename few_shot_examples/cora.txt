@@ -1,0 +1,18 @@
+
+Example1:
+## Target node:
+Paper id: 1021
+Title: Title: Lemma 2.3 The system is reachable and observable and realizes the same input/output behavior as
+Answer: Neural Network
+
+Example2:
+## Target node:
+Paper id: 2294
+Title: Title: Cooperative Bayesian and Case-Based Reasoning for Solving Multiagent Planning Tasks
+Answer: Case Based
+
+Example3:
+## Target node:
+Paper id: 1959
+Title: Title: Evolution-based Discovery of Hierarchical Behaviors
+Answer: Genetic Algorithms
