@@ -98,7 +98,7 @@ We provide some baseline models in `baseline` folder. The `baseline/output_model
 
 ## 4. Quick Start
 The Architecture of LLM benchmarking is shown as follows:
-![](big picture.jpg)
+![](./big picture.jpg)
 
 ### Graph encoding 
 We combine the original graph datasets with their corresponding raw text attributes to encode the graph into a format that LLMs can understand, i.e., prompts. The prompt formats required for node classification and link prediction differ based on the specific task.
