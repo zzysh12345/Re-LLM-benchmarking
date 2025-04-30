@@ -16,6 +16,7 @@ from utils.load_cora import get_raw_text_cora
 from utils.load_pubmed import get_raw_text_pubmed
 from utils.load_arxiv_2023 import get_raw_text_arxiv_2023
 from utils.load_products import get_raw_text_products
+from utils.load_heg import get_raw_text_heg
 from time import sleep
 from utils.prompts import generate_system_prompt, arxiv_natural_lang_mapping, generate_question_prompt
 
@@ -56,6 +57,8 @@ def load_data(dataset, trian_perc, val_perc, test_perc, use_text=False, seed=0):
         data, text = get_raw_text_arxiv_2023(use_text)
     elif dataset == "product":
         data, text = get_raw_text_products(use_text)
+    elif dataset in ['Actor', 'Amazon']:
+        data, text = get_raw_text_heg(dataset, use_text)
     else:
         raise ValueError("Dataset must be one of: cora, pubmed, arxiv")
     return data, text
@@ -115,26 +118,32 @@ def get_and_save_message_for_node(node_index_list, data, text, dataset, source, 
 
             context = "" + prefix_prompt
             context += '\n## Target node:\n'
-            if source == 'product':
+            if source == 'product' or source == 'Amazon':
                 context += f'Product id: {node_index}\n'
+            elif source == 'Actor':
+                context += f'Actor id: {node_index}\n'
             else:
                 context += f'Paper id: {node_index}\n'
             question = generate_question_prompt(source, arxiv_style, include_options, is_train)
             answer = text['label'][node_index]
 
-            title = text['title'][node_index]
-            if source == 'product':
+            if source in ['Actor', 'Amazon']:
                 content = text['content'][node_index]
-                if include_abs:
-                    context = f"{context}Title: {title}\nContent: {content}\n"
-                else:
-                    context = f"{context}Title: {title}\n"
+                context = f"{context}Content: {content}\n"
             else:
-                abstract = text['abs'][node_index]
-                if include_abs:
-                    context = f"{context}Title: {title}\nAbstract: {abstract}\n"
+                title = text['title'][node_index]
+                if source == 'product':
+                    content = text['content'][node_index]
+                    if include_abs:
+                        context = f"{context}Title: {title}\nContent: {content}\n"
+                    else:
+                        context = f"{context}Title: {title}\n"
                 else:
-                    context = f"{context}Title: {title}\n"
+                    abstract = text['abs'][node_index]
+                    if include_abs:
+                        context = f"{context}Title: {title}\nAbstract: {abstract}\n"
+                    else:
+                        context = f"{context}Title: {title}\n"
 
 
             # all_hops = get_hop_nodes(data, node_index, data.edge_index, is_train, hop)
@@ -933,7 +942,12 @@ def generate_structure_prompt(node_index, text, all_hops, data, hop, max_papers_
     """
     np.random.seed(42)
     prompt_str = ""
-    Target_word = "Product id: " if dataset == "product" else "Paper id: "
+    if dataset in ["product", "Amazon"]:
+        Target_word = "Product id"
+    elif dataset == 'Actor':
+        Target_word = "Actor id"
+    else:
+        Target_word = "Paper id"
 
     for h in range(0, hop):
         neighbors_at_hop = all_hops[h]
@@ -946,28 +960,44 @@ def generate_structure_prompt(node_index, text, all_hops, data, hop, max_papers_
             neighbors_at_hop = neighbors_at_hop[:max_papers_2]
 
         if len(neighbors_at_hop) > 0:
-            if dataset != 'product':
-                prompt_str += f"\nKnown neighbor papers at hop {h + 1} (partial, may be incomplete):\n"
-            else:
+            if dataset == 'Actor':
+                prompt_str += f"\nKnown co-occurred actors on the same Wikipedia page at hop {h + 1} (partial, may be incomplete):\n"
+            elif dataset in ['product', 'Amazon']:
                 prompt_str += f"\nKnown neighbor products purchased toghther at hop {h + 1} (partial, may be incomplete):\n"
+            else:
+                prompt_str += f"\nKnown neighbor papers at hop {h + 1} (partial, may be incomplete):\n"
 
             if mode != 'pure structure':
-                for i, neighbor_idx in enumerate(neighbors_at_hop):
-                    neighbor_title = text['title'][neighbor_idx]
-                    prompt_str += f"\n{Target_word}{neighbor_idx}\nTitle: {neighbor_title}\n"
+                if dataset in ['Actor', 'Amazon']:
+                    for i, neighbor_idx in enumerate(neighbors_at_hop):
+                        neighbor_content = text['content'][neighbor_idx]
+                        prompt_str += f"\n{Target_word}{neighbor_idx}\nContent: {neighbor_content}\n"
 
-                    if abstract_len > 0:
-                        neighbor_abstract = text['abs'][neighbor_idx]
-                        prompt_str += f"Abstract: {neighbor_abstract[:abstract_len]}\n"
+                        if is_train:
+                            if include_label and data.train_mask[neighbor_idx]:
+                                label = text['label'][neighbor_idx]
+                                prompt_str += f"Label: {label}\n"
+                        else:
+                            if include_label and (data.train_mask[neighbor_idx] or data.val_mask[neighbor_idx]):
+                                label = text['label'][neighbor_idx]
+                                prompt_str += f"Label: {label}\n"
+                else:
+                    for i, neighbor_idx in enumerate(neighbors_at_hop):
+                        neighbor_title = text['title'][neighbor_idx]
+                        prompt_str += f"\n{Target_word}{neighbor_idx}\nTitle: {neighbor_title}\n"
 
-                    if is_train:
-                        if include_label and data.train_mask[neighbor_idx] :
-                            label = text['label'][neighbor_idx]
-                            prompt_str += f"Label: {label}\n"
-                    else:
-                        if include_label and (data.train_mask[neighbor_idx] or data.val_mask[neighbor_idx]):
-                            label = text['label'][neighbor_idx]
-                            prompt_str += f"Label: {label}\n"
+                        if abstract_len > 0:
+                            neighbor_abstract = text['abs'][neighbor_idx]
+                            prompt_str += f"Abstract: {neighbor_abstract[:abstract_len]}\n"
+
+                        if is_train:
+                            if include_label and data.train_mask[neighbor_idx] :
+                                label = text['label'][neighbor_idx]
+                                prompt_str += f"Label: {label}\n"
+                        else:
+                            if include_label and (data.train_mask[neighbor_idx] or data.val_mask[neighbor_idx]):
+                                label = text['label'][neighbor_idx]
+                                prompt_str += f"Label: {label}\n"
             else:
                 for i, neighbor_idx in enumerate(neighbors_at_hop):
                     prompt_str += f"\n{Target_word}{neighbor_idx}"

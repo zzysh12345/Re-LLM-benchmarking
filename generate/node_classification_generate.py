@@ -62,3 +62,6 @@ def run_node_classification_generate(dataset_name, arxiv_style, is_train, mode, 
 
     get_and_save_message_for_node(sample_indices, data, text, dataset_name, include_label=include_label, source=source, save_dir=save_dir, hop=hop, max_papers_1=max_papers_1, max_papers_2=max_papers_2, mode=mode, arxiv_style=arxiv_style, include_abs=include_abs, include_options=include_options, zero_shot_CoT=zero_shot_CoT, BAG=BAG, few_shot=few_shot, options=options, is_train=is_train)
 
+
+if __name__ == '__main__':
+    run_node_classification_generate('Actor', 'identifier', True, 'neighbors', False, 1, False, True, 1000, False, False, True, '../output')

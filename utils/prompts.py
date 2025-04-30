@@ -22,12 +22,12 @@ def generate_arxiv_prompts(include_options, arxiv_natural_lang_mapping):
 def generate_system_prompt(source, arxiv_style="subcategory", include_options=False):
     """
     Generate a system prompt based on the given content type and source.
-    
+
     Args:
     - content_type (str): Specifies the type of content (e.g., title, abstract, neighbors).
     - source (str): Specifies the data source (e.g., arxiv, cora, pubmed, product).
     - use_original_arxiv (bool, optional): If set to True, a special prompt for 'arxiv' is used.
-    
+
     Returns:
     - str: Generated system prompt.
     """
@@ -38,7 +38,7 @@ def generate_system_prompt(source, arxiv_style="subcategory", include_options=Fa
     }
 
     arxiv_prompts = generate_arxiv_prompts(include_options, arxiv_natural_lang_mapping)
-    
+
     prompts = {
         'arxiv': arxiv_prompts[arxiv_style],
         'cora': "Please predict the most appropriate category for the paper. Choose from the following categories:\n\n{}",
@@ -62,17 +62,22 @@ def generate_question_prompt(source, arxiv_style="subcategory", include_options=
     categories = {
         'cora': ["Rule Learning", "Neural Networks", "Case Based", "Genetic Algorithms", "Theory",
                  "Reinforcement Learning", "Probabilistic Methods"],
-        'pubmed': ["Type 1 diabetes", "Type 2 diabetes", "Experimentally induced diabetes"]
+        'pubmed': ["Type 1 diabetes", "Type 2 diabetes", "Experimentally induced diabetes"],
+        'Actor': ["American film actors (only)", "American film actors and American television actors",
+                  "American television actors and American stage actors", "Canadian actors", "English actors"],
+        'Amazon': ["Rating 3.5", "Rating 4.0", "Rating 4.5", "Rating 5.0", "Rating lower than 3.5"]
     }
     arxiv_prompts = generate_arxiv_prompts(include_options, arxiv_natural_lang_mapping)
     prompts = {
         'arxiv': arxiv_prompts[arxiv_style],
         'cora': "Please predict the most appropriate category for the Target node. Choose from the following categories:\n{}",
         'pubmed': "Please predict the most likely type of the Target node. Your answer should be chosen from:\n{}",
-        'product': "Please predict the most likely category of this Target node from Amazon. Your answer should be chosen from the list:\n{}"
+        'product': "Please predict the most likely category of this Target node from Amazon. Your answer should be chosen from the list:\n{}",
+        'Actor': "Please predict the most likely category of this Target node. Your answer should be chosen from the list:\n{}",
+        'Amazon': "Please predict the most likely category of this Target node. Your answer should be chosen from the list:\n{}"
     }
     prompt = prompts[source]
-    if source in ['cora', 'pubmed']:
+    if source in ['cora', 'pubmed', 'Actor', 'Amazon']:
         categories_list = "\n".join(categories[source])
         prompt = prompt.format(categories_list)
         # return prompt.format(categories_list)

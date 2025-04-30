@@ -74,45 +74,52 @@ for combo in combinations:
 print(f"Number of combinations: {len(filtered_combinations)}", flush=True)
 
 def process_combination(combo):
-    try:
-        dataset = combo['dataset']
-        is_train = combo['is_train']
-        mode = combo['mode']
-        zero_shot_CoT = combo['zero_shot_CoT']
-        BAG = combo['BAG']
-        few_shot = combo['few_shot']
-        hop = combo['hop']
-        include_label = combo['include_label']
+    dataset = combo['dataset']
+    is_train = combo['is_train']
+    mode = combo['mode']
+    zero_shot_CoT = combo['zero_shot_CoT']
+    BAG = combo['BAG']
+    few_shot = combo['few_shot']
+    hop = combo['hop']
+    include_label = combo['include_label']
 
-        if dataset == "cora":
-            test_sample_size = 542
-        else:
-            test_sample_size = 1000
+    if dataset == "cora":
+        test_sample_size = 542
+    else:
+        test_sample_size = 1000
 
-        arxiv_style = "subcategory"
-        print(f"Running: {combo}", flush=True)
+    arxiv_style = "subcategory"
+    print(f"Running: {combo}", flush=True)
 
-        run_node_classification_generate(
-            dataset,
-            arxiv_style,
-            is_train,
-            mode,
-            zero_shot_CoT,
-            hop,
-            False,
-            include_label,
-            test_sample_size,
-            BAG=BAG,
-            few_shot=few_shot,
-            include_options=True,
-            save_dir='output'
-        )
-    except Exception as e:
-        print(f"Error with combo {combo}: {e}", flush=True)
+    run_node_classification_generate(
+        dataset,
+        arxiv_style,
+        is_train,
+        mode,
+        zero_shot_CoT,
+        hop,
+        False,
+        include_label,
+        test_sample_size,
+        BAG=BAG,
+        few_shot=few_shot,
+        include_options=True,
+        save_dir='output')
 # use ThreadPoolExecutor
 if __name__ == "__main__":
     try:
-        with ThreadPoolExecutor(max_workers=8) as executor:
-            executor.map(process_combination, filtered_combinations)
+        # with ThreadPoolExecutor(max_workers=8) as executor:
+        #     executor.map(process_combination, filtered_combinations)
+        combo_test = {
+            "dataset": 'Amazon',
+            "is_train": False,
+            "mode": "neighbors",
+            "zero_shot_CoT": True,
+            "BAG": False,
+            "few_shot": False,
+            "hop": 1,
+            "include_label": True
+        }
+        process_combination(combo_test)
     except Exception as e:
         print(e)
