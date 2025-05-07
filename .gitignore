@@ -1,0 +1,7 @@
+**/__pycache__
+# Ignore everything in dataset
+dataset/*
+# But not the cora directory
+!dataset/cora_data.pt
+!dataset/cora_text_pkl
+!dataset/Readme.md
